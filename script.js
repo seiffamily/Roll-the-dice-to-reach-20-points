@@ -1,69 +1,62 @@
-let accounts = {}; 
-let friends = []; 
+let users = [];          // Loaded from users.json
+let currentUser = null;  // Logged-in user
 let playerNames = [];
 let scores = [];
 let currentPlayer = 0;
 const winningScore = 20;
 
-function createAccount() {
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-    if(!email || !name){
-        document.getElementById('accountMsg').textContent = "Enter both email and name!";
+// Load users.json
+async function loadUsers() {
+    const response = await fetch('users.json');
+    users = await response.json();
+}
+loadUsers();
+
+// LOGIN
+function login() {
+    const name = document.getElementById('name').value.trim();
+    if(!name){
+        alert("Enter your name!");
         return;
     }
-    accounts[email] = name;
-    document.getElementById('accountMsg').textContent = `Account created for ${name}!`;
-    document.getElementById('setup').style.display = 'none';
+
+    currentUser = users.find(u => u.name === name);
+
+    if(!currentUser){
+        alert("Name not found!");
+        return;
+    }
+
+    document.getElementById('login').style.display = 'none';
     document.getElementById('friends').style.display = 'block';
+    updateFriendList();
 }
 
-function addFriend() {
-    const friendEmail = document.getElementById('friendEmail').value;
-    if(!friendEmail || !(friendEmail in accounts)){
-        alert("Friend must have an account!");
-        return;
-    }
-    if(!friends.includes(friendEmail)){
-        friends.push(friendEmail);
-        document.getElementById('friendList').textContent = "Your friends: " + friends.map(f=>accounts[f]).join(", ");
-    }
+// SHOW FRIENDS
+function updateFriendList() {
+    document.getElementById('friendList').textContent =
+        "Your friends: " + currentUser.friends.join(", ");
 }
 
-function startGameSetup() {
-    if(friends.length < 1){
-        alert("Add at least 1 friend!");
-        return;
-    }
-    document.getElementById('friends').style.display = 'none';
-    document.getElementById('gameSetup').style.display = 'block';
-}
-
+// START GAME
 function startGame() {
-    let numPlayers = parseInt(document.getElementById('numPlayers').value);
-    if(numPlayers < 2) numPlayers = 2;
-    if(numPlayers > friends.length + 1) numPlayers = friends.length + 1;
-
-    playerNames = [accounts[Object.keys(accounts)[0]]]; 
-    for(let i=0; i<numPlayers-1; i++){
-        playerNames.push(accounts[friends[i]]);
-    }
-
+    playerNames = [currentUser.name, ...currentUser.friends];
     scores = Array(playerNames.length).fill(0);
     currentPlayer = 0;
 
-    document.getElementById('gameSetup').style.display = 'none';
+    document.getElementById('friends').style.display = 'none';
     document.getElementById('game').style.display = 'block';
     document.getElementById('winner').textContent = "";
     updateDisplay();
 }
 
+// ROLL DICE
 function rollDice() {
-    const roll = Math.floor(Math.random()*6)+1;
+    const roll = Math.floor(Math.random() * 6) + 1;
     scores[currentPlayer] += roll;
     document.getElementById('dice').textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][roll-1];
 
-    if(scores[currentPlayer]>=winningScore){
+    if(scores[currentPlayer] >= winningScore){
         document.getElementById('winner').textContent = `${playerNames[currentPlayer]} WINS! 🎉`;
         document.querySelector('button[onclick="rollDice()"]').disabled = true;
     } else {
@@ -72,26 +65,18 @@ function rollDice() {
     }
 }
 
+// UPDATE DISPLAY
 function updateDisplay() {
     document.getElementById('turn').textContent = `${playerNames[currentPlayer]}'s Turn`;
     const scoreboard = document.getElementById('scoreboard');
     scoreboard.innerHTML = playerNames.map((p,i)=>`${p} Score: ${scores[i]}`).join("<br>");
 }
 
+// RESTART GAME
 function restartGame() {
     scores = Array(playerNames.length).fill(0);
     currentPlayer = 0;
     document.querySelector('button[onclick="rollDice()"]').disabled = false;
     document.getElementById('winner').textContent = "";
     updateDisplay();
-}
-
-function addPlayer() {
-    if(friends.length+1 >= playerNames.length + 1){
-        playerNames.push(accounts[friends[playerNames.length-1]]);
-        scores.push(0);
-        updateDisplay();
-    } else {
-        alert("No more friends to add!");
-    }
 }
