@@ -1,37 +1,41 @@
-<h1>Multiplayer Dice Game</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dice Game</title>
+<style>
+  #friends, #game { display: none; }
+  button { margin-top: 5px; }
+</style>
+</head>
+<body>
 
-<div id="setup">
-    <h2>Create Account</h2>
-    <label>Email: <input id="email"></label><br><br>
-    <label>Name: <input id="name"></label><br><br>
-    <button onclick="createAccount()">Create Account</button>
-    <p id="accountMsg"></p>
+<h1>Dice Game</h1>
+
+<!-- LOGIN -->
+<div id="login">
+  <h2>Login</h2>
+  Name: <input type="text" id="name">
+  <button onclick="login()">Login</button>
 </div>
 
-<div id="friends" style="display:none;">
-    <h2>Friend System</h2>
-    <label>Add Friend Email: <input id="friendEmail"></label>
-    <button onclick="addFriend()">Add Friend</button>
-    <p id="friendList">Your friends: None</p>
-    <button onclick="startGameSetup()">Go to Game Setup</button>
+<!-- FRIENDS -->
+<div id="friends">
+  <h2>Friends List</h2>
+  <div id="friendList"></div>
+  <button onclick="startGame()">Start Game</button>
 </div>
 
-<div id="gameSetup" style="display:none;">
-    <h2>Game Setup</h2>
-    <label>Number of Players (2-4): <input type="number" id="numPlayers" min="2" max="4" value="2"></label>
-    <button onclick="startGame()">Start Game</button>
+<!-- GAME -->
+<div id="game">
+  <h2 id="turn"></h2>
+  <div id="dice" style="font-size: 50px;">🎲</div>
+  <button onclick="rollDice()">Roll Dice</button>
+  <button onclick="restartGame()">Restart</button>
+  <div id="scoreboard"></div>
+  <h3 id="winner"></h3>
 </div>
 
-<div id="game" style="display:none;">
-    <h2 id="turn"></h2>
-    <div id="dice">🎲</div>
-    <button onclick="rollDice()">Roll Dice</button>
-    <button onclick="restartGame()">Restart Game</button>
-    <button onclick="addPlayer()">Add Player</button>
-    <div class="scoreboard" id="scoreboard"></div>
-    <h3 id="winner"></h3>
-</div>
-<link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
-
-
+<script src="dice.js"></script>
+</body>
+</html>
